@@ -85,6 +85,24 @@ export default {
       }),
     }))
   },
+  'ungoogled-software/ungoogled-chromium-portablelinux': async (release) => {
+    const pattern = /ungoogled-chromium[_-](?<version>\d+(?:[.]\d+)+)-(?<revision>\d+)\.(?<package_revision>\d+)(?<type>_linux\.tar\.xz|\.AppImage)/
+
+    return HELPERS.githubReleaseDefaultMapper(release, (release) => ({
+      ...release,
+      name: 'Ungoogled-Chromium ' + release.tag_name,
+      assets: release.assets.map((asset) => {
+        const assetDetails = HELPERS.extract(asset.name, pattern)
+
+        return {
+          ...asset,
+          arch: ENUMS.ARCH.x86_64,
+          os: ENUMS.OS.linux,
+          discriminator: assetDetails.type === '.AppImage' ? 'AppImage' : undefined,
+        }
+      }),
+    }))
+  },
   'ungoogled-software/ungoogled-chromium-windows': async (release) => {
     const pattern = /ungoogled-chromium[_-](?<version>\d+(?:[.]\d+)+)-(?<revision>\d+)\.(?<package_revision>\d+)_(installer|windows)_(?<arch>x64|x86)\.(?<type>exe|zip)/
 
