@@ -28,6 +28,37 @@ export default {
       }),
     }))
   },
+  'ungoogled-software/ungoogled-chromium-archlinux': async (release) => {
+    const pattern = /ungoogled-chromium[_-](?:(?<debug>debug)[_-])?(?<version>\d+(?:[.]\d+)+)-(?<revision>\d+)-(?<arch>x86_64|arm64)\.pkg\.tar\.zst/g
+    const hashesPattern = /(?<sha256>[A-Fa-f0-9]{64}) {2}(?<name>ungoogled-chromium.*?\.pkg\.tar\.zst)\n/g
+
+    const hashes = HELPERS.extractMany(release.body, hashesPattern)
+
+    return HELPERS.githubReleaseDefaultMapper(release, (release) => ({
+      ...release,
+      name: 'Ungoogled-Chromium ' + release.tag_name,
+      assets: release.assets
+        .map((asset) => {
+          const assetDetails = HELPERS.extract(asset.name, pattern)
+          if (Object.keys(assetDetails).length === 0) {
+            return false
+          }
+
+          const assetHashes = hashes.find((hash) => hash.name === asset.name)
+
+          return {
+            ...asset,
+            arch: assetDetails.arch === 'x86_64' ? ENUMS.ARCH.x86_64 : ENUMS.ARCH.arm64,
+            os: ENUMS.OS.linux,
+            discriminator: assetDetails.debug === 'debug' ? 'DEBUG' : undefined,
+            hashes: {
+              sha256: assetHashes.sha256,
+            },
+          }
+        })
+        .filter(Boolean),
+    }))
+  },
   'ungoogled-software/ungoogled-chromium-macos': async (release) => {
     const filenamePattern = /ungoogled-chromium[_-](?<version>\d+(?:[.]\d+)+)-(?<revision>\d+)\.(?<package_revision>\d+)_(?<arch>x86-64|arm64)-macos\.dmg/
     const hashesPattern = /disk image `(?<name>ungoogled-chromium_.*)`: \n\n```\nmd5: (?<md5>.*)\nsha1: (?<sha1>.*)\nsha256: (?<sha256>.*)\n```/g
