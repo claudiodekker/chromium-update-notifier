@@ -1,0 +1,74 @@
+name: Release new version
+
+on:
+  workflow_dispatch:
+    inputs:
+      type:
+        type: choice
+        description: Please select the type of release
+        options:
+            - patch
+            - minor
+            - major
+
+jobs:
+  release:
+    name: Release new version
+    runs-on: macos-12
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - name: Install dependencies
+        run: npm ci
+      - name: Bump version
+        id: version
+        run: |
+          set -e
+          version=$(npm version ${{ github.event.inputs.type }} --no-git-tag-version)
+          echo "Version set to $version"
+          echo "version=$version" >> $GITHUB_OUTPUT
+          sed -i '' "s/0\.0\.0/${version#v}/g" public/manifest.json
+          sed -i '' "s/version='[0-9.]*' status='ok'/version='${version#v}' status='ok'/" updates.xml
+          git --no-pager diff public/manifest.json updates.xml
+      - name: Setup Chromium
+        run: |
+          wget --no-verbose -O ungoogled-chromium.dmg https://github.com/claudiodekker/ungoogled-chromium-macos/releases/download/121.0.6167.139-1.1/ungoogled-chromium_121.0.6167.139-1.1_x86-64-macos-signed.dmg
+          hdiutil attach ungoogled-chromium.dmg
+      - name: Build extension
+        run: npm run build
+      - name: Package extension
+        env:
+          PACKAGING_PRIVATE_KEY: ${{ secrets.PACKAGING_PRIVATE_KEY }}
+        run: |
+          echo $PACKAGING_PRIVATE_KEY | base64 --decode > /tmp/key.pem
+          /Volumes/Chromium/Chromium.app/Contents/MacOS/Chromium --pack-extension=dist --pack-extension-key=/tmp/key.pem
+          mv dist.crx chromium-update-notifier.crx
+      - name: Prepare release text
+        run: |
+          echo "## ${{ steps.version.outputs.version }}" > github_release_text.md
+          echo "" >> github_release_text.md
+          echo "For more information, see the [CHANGELOG.md](https://github.com/claudiodekker/chromium-update-notifier/blob/master/CHANGELOG.md) file." >> github_release_text.md
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ steps.version.outputs.version }}
+          body_path: github_release_text.md
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+          files: chromium-update-notifier.crx
+      - name: Commit version bump
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: master
+          commit_message: "Bump version to ${{ steps.version.outputs.version }}"
+          file_pattern: package.json package-lock.json updates.xml

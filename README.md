@@ -66,9 +66,11 @@ If you're maintaining a repository and would like to be added to the list, pleas
 By default, the extension is configured to detect your OS and architecture, and only filter releases relevant to it.
 You can change this in the settings page of the extension (rightclick the icon and click "Options").
 
-### Q: How do I update this extension?
+### Q: How do I update this extension, or make sure it's auto-updated?
 
-You can manually update the extension from time to time by following the installation instructions again.
+The recommended approach would be to use [NeverDecaf/chromium-web-store](https://github.com/NeverDecaf/chromium-web-store), as it will automatically check for updates and notify you when one is available.
+
+Alternatively, you can manually update the extension from time to time by following the installation instructions again.
 
 ## Changelog
 
