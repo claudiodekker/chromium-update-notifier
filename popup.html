@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en" class="bg-white dark:bg-chromiumPrimaryDark select-none">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/assets/icon_64.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chromium Update Notifier</title>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module">
+    import { createApp } from './src/app.js';
+    import Popup from "./src/Popup.vue";
+
+    createApp(Popup).mount('#app');
+  </script>
+</body>
+</html>

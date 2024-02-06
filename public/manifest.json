@@ -1,0 +1,35 @@
+{
+  "action": {
+    "default_icon": {
+      "16": "assets/icon_16.png",
+      "32": "assets/icon_32.png",
+      "64": "assets/icon_64.png"
+    },
+    "default_title": "Chromium Update Notifier",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "description": "A simple extension that periodically checks whether a new Chromium release is available.",
+  "homepage_url": "https://github.com/claudiodekker/chromium-update-notifier",
+  "icons": {
+    "16": "assets/icon_16.png",
+    "32": "assets/icon_32.png",
+    "64": "assets/icon_64.png",
+    "128": "assets/icon_128.png"
+  },
+  "manifest_version": 3,
+  "name": "Chromium Update Notifier",
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "permissions": [
+    "alarms",
+    "downloads",
+    "storage"
+  ],
+  "version": "1.0.0"
+}
