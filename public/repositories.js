@@ -60,8 +60,8 @@ export default {
     }))
   },
   'ungoogled-software/ungoogled-chromium-macos': async (release) => {
-    const filenamePattern = /ungoogled-chromium[_-](?<version>\d+(?:[.]\d+)+)-(?<revision>\d+)\.(?<package_revision>\d+)_(?<arch>x86-64|arm64)-macos\.dmg/
-    const hashesPattern = /disk image `(?<name>ungoogled-chromium_.*)`: \n\n```\nmd5: (?<md5>.*)\nsha1: (?<sha1>.*)\nsha256: (?<sha256>.*)\n```/g
+    const filenamePattern = /ungoogled-chromium[_-](?<version>\d+(?:[.]\d+)+)-(?<revision>\d+)\.(?<package_revision>\d+)_(?<arch>x86[_-]64|arm64)-macos\.dmg/
+    const hashesPattern = /disk image `(?<name>ungoogled-chromium_.*?)`:[\s\S]*?```[\s\S]*?md5: (?<md5>.*)[\s\S]*?sha1: (?<sha1>.*)[\s\S]*?sha256: (?<sha256>.*)[\s\S]*?```/g
 
     const hashes = HELPERS.extractMany(release.body, hashesPattern)
 
@@ -74,7 +74,7 @@ export default {
 
         return {
           ...asset,
-          arch: assetDetails.arch,
+          arch: assetDetails.arch.replace('_', '-'),
           os: ENUMS.OS.macos,
           hashes: {
             md5: assetHashes.md5,
