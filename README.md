@@ -74,7 +74,7 @@ Alternatively, you can manually update the extension from time to time by follow
 
 ## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+Please see [Github Releases](https://github.com/claudiodekker/chromium-update-notifier/releases) for more information what has changed recently.
 
 ## Contributing
 
