@@ -80,7 +80,7 @@ const methods = {
     }
 
     const repository = await store.getRepository()
-    let releaseParser = repositories[repository]
+    const releaseParser = repositories[repository]
     if (!releaseParser) {
       throw new Error(`No release parser found for repository [${repository}]`)
     }
