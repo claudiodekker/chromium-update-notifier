@@ -94,6 +94,55 @@ export default {
       }),
     }))
   },
+  'Alex313031/Thorium-Win': async (release) => {
+    const zipPattern = /(?:Thorium|thorium)_?(?<optimization>AVX2|AVX|SSE3|SSE4|Th24)?_?(?<beta>BETA\d*)?_?(?<version>\d+(?:\.\d+)+)\.zip/
+    const exePattern = /(?:Thorium|thorium)_?(?<optimization>AVX2|AVX|SSE3|SSE4|Th24|WIN7)?_?(?<beta>BETA\d*)?_?(?:mini_)?installer\.exe/
+
+    const isBeta = release.name.toLowerCase().includes('beta')
+
+    return HELPERS.githubReleaseDefaultMapper(release, (release) => ({
+      ...release,
+      name: 'Thorium ' + release.tag_name + (isBeta ? ' BETA' : ''),
+      assets: release.assets
+        .map((asset) => {
+          let assetDetails = {}
+          let isZip = asset.name.endsWith('.zip')
+
+          if (isZip) {
+            assetDetails = HELPERS.extract(asset.name, zipPattern)
+          } else if (asset.name.endsWith('.exe')) {
+            assetDetails = HELPERS.extract(asset.name, exePattern)
+          }
+
+          if (Object.keys(assetDetails).length === 0) {
+            return false
+          }
+
+          // Skip policy templates and debug shells
+          if (asset.name.includes('policy_templates') || asset.name.includes('Debug_Shell')) {
+            return false
+          }
+
+          let discriminator = assetDetails.optimization ? assetDetails.optimization : ''
+
+          if (assetDetails.beta) {
+            discriminator += ' BETA'
+          }
+
+          if (isZip) {
+            discriminator += ' ZIP'
+          }
+
+          return {
+            ...asset,
+            arch: ENUMS.ARCH.x86_64,
+            os: ENUMS.OS.windows,
+            discriminator: discriminator.trim(),
+          }
+        })
+        .filter(Boolean),
+    }))
+  },
   'Hibbiki/chromium-win64': async (release) => {
     const filenamePattern = /(?<name>\w+)\.?(?<variant>nosync|sync)?\.(?<type>exe|7z)/
     const hashesPattern = /(?<sha1>\w+) {1,2}\.\.\/out\/(?<arch>x64\/)?(?<name>.*?\.(exe|7z))/g
