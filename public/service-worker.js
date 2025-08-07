@@ -225,3 +225,15 @@ chrome.runtime.onInstalled.addListener(async function (details) {
   await extension.configureAlarms()
   await extension.update()
 })
+
+chrome.notifications.onButtonClicked.addListener(async function (notificationId, buttonIndex) {
+  if (buttonIndex === 0) { // "Open Options" button
+    chrome.runtime.openOptionsPage()
+  }
+  chrome.notifications.clear(notificationId)
+})
+
+chrome.notifications.onClicked.addListener(async function (notificationId) {
+  chrome.runtime.openOptionsPage()
+  chrome.notifications.clear(notificationId)
+})
