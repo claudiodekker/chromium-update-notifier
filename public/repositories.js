@@ -94,4 +94,40 @@ export default {
       }),
     }))
   },
+  'Hibbiki/chromium-win64': async (release) => {
+    const filenamePattern = /(?<name>\w+)\.?(?<variant>nosync|sync)?\.(?<type>exe|7z)/
+    const hashesPattern = /(?<sha1>\w+) {1,2}\.\.\/out\/(?<arch>x64\/)?(?<name>.*?\.(exe|7z))/g
+
+    const hashes = HELPERS.extractMany(release.body, hashesPattern)
+
+    return HELPERS.githubReleaseDefaultMapper(release, (release) => ({
+      ...release,
+      name: 'Chromium ' + release.tag_name,
+      assets: release.assets
+        .map((asset) => {
+          const assetDetails = HELPERS.extract(asset.name, filenamePattern)
+          if (!assetDetails || Object.keys(assetDetails).length === 0) {
+            return false
+          }
+
+          const assetHashes = hashes.find((hash) => hash.name === asset.name)
+
+          let discriminator = assetDetails.type === '7z' ? '7z' : 'installer'
+          if (assetDetails.variant === 'nosync') {
+            discriminator = 'nosync ' + discriminator
+          }
+
+          return {
+            ...asset,
+            arch: ENUMS.ARCH.x86_64,
+            os: ENUMS.OS.windows,
+            discriminator,
+            hashes: {
+              sha1: assetHashes && assetHashes.sha1 ? assetHashes.sha1 : undefined,
+            },
+          }
+        })
+        .filter(Boolean),
+    }))
+  },
 }
