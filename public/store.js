@@ -20,6 +20,7 @@ export const store = {
 
   setRepository: (repository) => storage.set({ repository }),
   getRepository: storage.getOrDefault('repository', 'ungoogled-software/ungoogled-chromium-macos'),
+  resetDefaultRepository: () => store.setRepository('ungoogled-software/ungoogled-chromium-macos'),
 
   setOSFilter: (OSFilter) => storage.set({ OSFilter }),
   getOSFilter: storage.getOrDefault('OSFilter', 'detect'),

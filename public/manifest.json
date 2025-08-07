@@ -30,6 +30,7 @@
   "permissions": [
     "alarms",
     "downloads",
+    "notifications",
     "storage"
   ],
   "version": "0.0.0"

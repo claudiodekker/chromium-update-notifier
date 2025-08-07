@@ -80,9 +80,19 @@ const methods = {
     }
 
     const repository = await store.getRepository()
-    const releaseParser = repositories[repository]
+    let releaseParser = repositories[repository]
     if (!releaseParser) {
-      throw new Error(`No release parser found for repository [${repository}]`)
+      await store.resetDefaultRepository()
+      const defaultRepository = await store.getRepository()
+      
+      chrome.notifications.create({
+        type: 'basic',
+        iconUrl: 'assets/icon_64.png',
+        title: 'Repository Changed',
+        message: `The "${repository}" repository is no longer supported. Please check the extension settings to select a new repository.`,
+      })
+      
+      releaseParser = repositories[defaultRepository]
     }
 
     const request = await fetch(`https://api.github.com/repos/${repository}/releases`)
@@ -141,6 +151,20 @@ const methods = {
 
     return availableReleases
   },
+  ensureRepositorySupported: async () => {
+    if (Object.keys(repositories).includes(await store.getRepository())) {
+      return
+    }
+    
+    await store.resetDefaultRepository()
+
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'assets/icon_64.png',
+      title: 'Preferred Repository Reset',
+      message: 'Your configured repository is no longer supported. Please check the extension settings to select a new repository.',
+    })
+  },
 }
 
 const extension = {
@@ -155,6 +179,7 @@ const extension = {
     chrome.action.setBadgeBackgroundColor({ color: '#FF0000' })
   },
   update: async () => {
+    await methods.ensureRepositorySupported()
     const updates = await methods.checkForUpdates()
 
     if (updates.length > 0) {
