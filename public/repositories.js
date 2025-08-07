@@ -94,4 +94,41 @@ export default {
       }),
     }))
   },
+  'win32ss/supermium': async (release) => {
+    const filenamePattern = /supermium_[\d_]*?_(?<arch>32|64)_(?<variant>nonsetup\.zip|setup\.exe|setup_win10_11\.exe|syms.7z)/
+    const hashesPattern = /(?:\\r|\\n)*?(?<name>[\w.]+) : \d+ bytes[\s\S]+?SHA2-256 : (?<sha256>\w+)/gm
+
+    const hashes = HELPERS.extractMany(release.body, hashesPattern)
+
+    return HELPERS.githubReleaseDefaultMapper(release, (release) => ({
+      ...release,
+      assets: release.assets
+        .map((asset) => {
+          if (asset.name.includes('syms.7z')) {
+            return false // Skip symbol files
+          }
+
+          const assetDetails = HELPERS.extract(asset.name, filenamePattern)
+          const assetHashes = hashes.find((hash) => hash.name === asset.name)
+
+          let discriminator = ''
+          if (assetDetails.variant === 'nonsetup.zip') {
+            discriminator = 'ZIP'
+          } else if (assetDetails.variant === 'setup_win10_11.exe') {
+            discriminator = 'Win10/11'
+          }
+
+          return {
+            ...asset,
+            arch: assetDetails.arch === '32' ? ENUMS.ARCH.x86_32 : ENUMS.ARCH.x86_64,
+            os: ENUMS.OS.windows,
+            discriminator,
+            hashes: {
+              sha256: assetHashes && assetHashes.sha256 ? assetHashes.sha256 : undefined,
+            },
+          }
+        })
+        .filter(Boolean),
+    }))
+  },
 }
