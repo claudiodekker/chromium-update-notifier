@@ -1,0 +1,40 @@
+name: "Enforce Changelog Labels"
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled, unlabeled, ready_for_review]
+
+jobs:
+  check-label:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Verify changelog label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const core = require('@actions/core');
+            const required = [
+              'changelog:added',
+              'changelog:changed',
+              'changelog:deprecated',
+              'changelog:fixed',
+              'changelog:removed',
+              'changelog:security',
+              'dependencies', # Dependabot updates
+            ];
+
+            const pr = context.payload.pull_request;
+            // Skip draft PRs to avoid noisy failures during WIP
+            if (pr.draft) {
+              core.info('Draft PR – skipping changelog-label check.');
+              return;
+            }
+
+            const labels = pr.labels.map(label => label.name);
+            if (!labels.some(label => required.includes(label))) {
+              core.setFailed(`Missing changelog label – add one of: ${required.join(', ')}`);
+            } else {
+              core.info('Changelog label present.');
+            }
