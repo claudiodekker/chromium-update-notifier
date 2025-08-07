@@ -21,7 +21,7 @@ jobs:
               'changelog:fixed',
               'changelog:removed',
               'changelog:security',
-              'dependencies', # Dependabot updates
+              'dependencies', // Dependabot updates
             ];
 
             const pr = context.payload.pull_request;
