@@ -19,7 +19,7 @@ export const store = {
   getPlatformInfo: () => HELPERS.promisify(chrome.runtime, 'getPlatformInfo')(),
 
   setRepository: (repository) => storage.set({ repository }),
-  getRepository: storage.getOrDefault('repository', 'claudiodekker/ungoogled-chromium-macos'),
+  getRepository: storage.getOrDefault('repository', 'ungoogled-software/ungoogled-chromium-macos'),
 
   setOSFilter: (OSFilter) => storage.set({ OSFilter }),
   getOSFilter: storage.getOrDefault('OSFilter', 'detect'),
