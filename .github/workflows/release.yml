@@ -2,14 +2,6 @@ name: Release new version
 
 on:
   workflow_dispatch:
-    inputs:
-      type:
-        type: choice
-        description: Please select the type of release
-        options:
-            - patch
-            - minor
-            - major
 
 jobs:
   release:
@@ -22,28 +14,54 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
+          
       - name: Install dependencies
         run: npm ci
-      - name: Bump version
-        id: version
+        
+      - name: Get latest draft release
+        id: draft_release
         run: |
-          set -e
-          version=$(npm version ${{ github.event.inputs.type }} --no-git-tag-version)
-          echo "Version set to $version"
-          echo "version=$version" >> $GITHUB_OUTPUT
-          sed -i '' "s/0\.0\.0/${version#v}/g" public/manifest.json
-          sed -i '' "s/version='[0-9.]*' status='ok'/version='${version#v}' status='ok'/" updates.xml
-          git --no-pager diff public/manifest.json updates.xml
+          draft_release=$(gh release list --json isDraft,tagName,name,id --jq '.[] | select(.isDraft == true) | .[0]')
+          
+          if [ -z "$draft_release" ]; then
+            echo "No draft release found. Please create a draft release first."
+            exit 1
+          fi
+          
+          tag_name=$(echo "$draft_release" | jq -r '.tagName')
+          release_name=$(echo "$draft_release" | jq -r '.name')
+          release_id=$(echo "$draft_release" | jq -r '.id')
+          
+          echo "Found draft release: $release_name (tag: $tag_name)"
+          echo "tag_name=$tag_name" >> $GITHUB_OUTPUT
+          echo "release_name=$release_name" >> $GITHUB_OUTPUT
+          echo "release_id=$release_id" >> $GITHUB_OUTPUT
+          echo "version=${tag_name#v}" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Update version in files
+        run: |
+          npm version ${{ steps.draft_release.outputs.version }} --no-git-tag-version
+          
+          sed -i '' "s/\"version\": \"[0-9.]*\"/\"version\": \"${{ steps.draft_release.outputs.version }}\"/g" public/manifest.json
+          sed -i '' "s/version='[0-9.]*' status='ok'/version='${{ steps.draft_release.outputs.version }}' status='ok'/" updates.xml
+
+          git --no-pager diff package.json public/manifest.json updates.xml
+          
       - name: Setup Chromium
         run: |
           wget --no-verbose -O ungoogled-chromium.dmg https://github.com/claudiodekker/ungoogled-chromium-macos/releases/download/121.0.6167.139-1.1/ungoogled-chromium_121.0.6167.139-1.1_x86-64-macos-signed.dmg
           hdiutil attach ungoogled-chromium.dmg
+          
       - name: Build extension
         run: npm run build
+        
       - name: Package extension
         env:
           PACKAGING_PRIVATE_KEY: ${{ secrets.PACKAGING_PRIVATE_KEY }}
@@ -51,24 +69,20 @@ jobs:
           echo $PACKAGING_PRIVATE_KEY | base64 --decode > /tmp/key.pem
           /Volumes/Chromium/Chromium.app/Contents/MacOS/Chromium --pack-extension=dist --pack-extension-key=/tmp/key.pem
           mv dist.crx chromium-update-notifier.crx
-      - name: Prepare release text
-        run: |
-          echo "## ${{ steps.version.outputs.version }}" > github_release_text.md
-          echo "" >> github_release_text.md
-          echo "For more information, see the [CHANGELOG.md](https://github.com/claudiodekker/chromium-update-notifier/blob/master/CHANGELOG.md) file." >> github_release_text.md
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: ${{ steps.version.outputs.version }}
-          tag_name: ${{ steps.version.outputs.version }}
-          body_path: github_release_text.md
-          draft: false
-          prerelease: false
-          fail_on_unmatched_files: true
-          files: chromium-update-notifier.crx
+          
+      - name: Upload extension to draft release
+        run: gh release upload ${{ steps.draft_release.outputs.tag_name }} chromium-update-notifier.crx --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Publish release
+        run: gh release edit ${{ steps.draft_release.outputs.tag_name }} --draft=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Commit version bump
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: master
-          commit_message: "Bump version to ${{ steps.version.outputs.version }}"
-          file_pattern: package.json package-lock.json updates.xml
+          commit_message: "Bump version to ${{ steps.draft_release.outputs.tag_name }}"
+          file_pattern: package.json package-lock.json public/manifest.json updates.xml

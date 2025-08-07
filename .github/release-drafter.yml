@@ -1,0 +1,71 @@
+template: |
+  $CHANGES
+  
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$RESOLVED_VERSION
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+change-template: '- $TITLE ([#$NUMBER](https://github.com/$OWNER/$REPOSITORY/pull/$NUMBER))'
+change-title-escapes: '\<*_&#@`'
+categories:
+  - title: Added
+    labels:
+      - 'changelog:added'
+  - title: Changed
+    labels:
+      - 'changelog:changed'
+  - title: Deprecated
+    labels:
+      - 'changelog:deprecated'
+  - title: Removed
+    labels:
+      - 'changelog:removed'
+  - title: Fixed
+    labels:
+      - 'changelog:fixed'
+  - title: Security
+    labels:
+      - 'security'
+      - 'changelog:security'
+  - title: 'Dependencies'
+    labels:
+      - 'dependencies'
+exclude-labels:
+  - 'skip-changelog'
+version-resolver:
+  minor:
+    labels:
+      - 'changelog:added'
+      - 'changelog:removed'
+      - 'changelog:deprecated'
+  patch:
+    labels:
+      - 'changelog:fixed'
+      - 'changelog:security'
+  default: patch
+autolabeler:
+  - label: 'changelog:added'
+    branch:
+      - '/feature\/.+/'
+      - '/feat\/.+/'
+  - label: 'changelog:changed'
+    branch:
+      - '/refactor\/.+/'
+    title:
+      - '/refactor/i'
+      - '/improve/i'
+  - label: 'changelog:deprecated'
+    branch:
+      - '/deprecate\/.+/'
+    title:
+      - '/deprecate/i'
+  - label: 'changelog:removed'
+    branch:
+      - '/remove\/.+/'
+    title:
+      - '/remove/i'
+      - '/delete/i'
+  - label: 'changelog:fixed'
+    branch:
+      - '/fix\/.+/'
+    title:
+      - '/fix/i'

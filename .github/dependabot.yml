@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      js-dependencies:
+        update-types:
+          - "minor"
+          - "patch"
+    allow:
+      - dependency-type: direct
+    versioning-strategy: increase-if-necessary
