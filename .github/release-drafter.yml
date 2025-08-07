@@ -4,7 +4,7 @@ template: |
   **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$RESOLVED_VERSION
 name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
-change-template: '- $TITLE ([#$NUMBER](https://github.com/$OWNER/$REPOSITORY/pull/$NUMBER))'
+change-template: '- $TITLE ([#$NUMBER]($URL))'
 change-title-escapes: '\<*_&#@`'
 categories:
   - title: Added
