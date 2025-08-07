@@ -6,7 +6,7 @@ on:
 jobs:
   release:
     name: Release new version
-    runs-on: macos-12
+    runs-on: macos-latest
 
     permissions:
       contents: write
@@ -26,21 +26,19 @@ jobs:
       - name: Get latest draft release
         id: draft_release
         run: |
-          draft_release=$(gh release list --json isDraft,tagName,name,id --jq '.[] | select(.isDraft == true) | .[0]')
+          draft_release=$(gh release list --json isDraft,tagName,name --jq '[.[] | select(.isDraft == true)][0]')
           
-          if [ -z "$draft_release" ]; then
+          if [ -z "$draft_release" ] || [ "$draft_release" = "null" ]; then
             echo "No draft release found. Please create a draft release first."
             exit 1
           fi
           
           tag_name=$(echo "$draft_release" | jq -r '.tagName')
           release_name=$(echo "$draft_release" | jq -r '.name')
-          release_id=$(echo "$draft_release" | jq -r '.id')
           
           echo "Found draft release: $release_name (tag: $tag_name)"
           echo "tag_name=$tag_name" >> $GITHUB_OUTPUT
           echo "release_name=$release_name" >> $GITHUB_OUTPUT
-          echo "release_id=$release_id" >> $GITHUB_OUTPUT
           echo "version=${tag_name#v}" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
