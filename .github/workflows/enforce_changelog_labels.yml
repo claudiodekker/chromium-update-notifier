@@ -14,7 +14,6 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const core = require('@actions/core');
             const required = [
               'changelog:added',
               'changelog:changed',
@@ -26,6 +25,7 @@ jobs:
             ];
 
             const pr = context.payload.pull_request;
+
             // Skip draft PRs to avoid noisy failures during WIP
             if (pr.draft) {
               core.info('Draft PR – skipping changelog-label check.');
