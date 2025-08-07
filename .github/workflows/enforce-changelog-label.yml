@@ -1,17 +1,18 @@
-name: "Enforce Changelog Labels"
+name: Enforce Changelog Label
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize, labeled, unlabeled, ready_for_review]
-
+    types: [opened, reopened, ready_for_review, labeled, unlabeled]
+    
+permissions:
+  pull-requests: read
+    
 jobs:
-  check-label:
+  check_label:
+    name: Enforce Changelog Label
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
     steps:
-      - name: Verify changelog label
-        uses: actions/github-script@v7
+      - uses: actions/github-script@v7
         with:
           script: |
             const required = [
