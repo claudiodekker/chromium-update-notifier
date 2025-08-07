@@ -5,14 +5,15 @@ const storage = {
   get: chrome.storage ? HELPERS.promisify(chrome.storage.local, 'get') : () => {},
   set: chrome.storage ? HELPERS.promisify(chrome.storage.local, 'set') : () => {},
   getOrDefault: function (key, fallback = undefined) {
-    return () => storage.get(key).then((item) => {
-      const value = item[key]
-      if (value !== undefined) {
-        return value
-      }
+    return () =>
+      storage.get(key).then((item) => {
+        const value = item[key]
+        if (value !== undefined) {
+          return value
+        }
 
-      return typeof fallback === 'function' ? fallback() : fallback
-    })
+        return typeof fallback === 'function' ? fallback() : fallback
+      })
   },
 }
 
@@ -22,7 +23,7 @@ const determineDefaultRepository = async () => {
     linux: 'ungoogled-software/ungoogled-chromium-portablelinux',
     mac: 'ungoogled-software/ungoogled-chromium-macos',
   }
-  
+
   try {
     const platformInfo = await store.getPlatformInfo()
     return defaultRepositories[platformInfo.os] || defaultRepositories.mac
@@ -39,7 +40,9 @@ export const store = {
       arguments: args,
     })
   },
+
   getPlatformInfo: () => HELPERS.promisify(chrome.runtime, 'getPlatformInfo')(),
+
   setRepository: (repository) => storage.set({ repository }),
   getRepository: storage.getOrDefault('repository', determineDefaultRepository),
   resetDefaultRepository: async () => await store.setRepository(await determineDefaultRepository()),

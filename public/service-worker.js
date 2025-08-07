@@ -82,17 +82,7 @@ const methods = {
     const repository = await store.getRepository()
     let releaseParser = repositories[repository]
     if (!releaseParser) {
-      await store.resetDefaultRepository()
-      const defaultRepository = await store.getRepository()
-      
-      chrome.notifications.create({
-        type: 'basic',
-        iconUrl: 'assets/icon_64.png',
-        title: 'Repository Changed',
-        message: `The "${repository}" repository is no longer supported. Please check the extension settings to select a new repository.`,
-      })
-      
-      releaseParser = repositories[defaultRepository]
+      throw new Error(`No release parser found for repository [${repository}]`)
     }
 
     const request = await fetch(`https://api.github.com/repos/${repository}/releases`)
@@ -155,7 +145,7 @@ const methods = {
     if (Object.keys(repositories).includes(await store.getRepository())) {
       return
     }
-    
+
     await store.resetDefaultRepository()
 
     chrome.notifications.create({
@@ -227,7 +217,8 @@ chrome.runtime.onInstalled.addListener(async function (details) {
 })
 
 chrome.notifications.onButtonClicked.addListener(async function (notificationId, buttonIndex) {
-  if (buttonIndex === 0) { // "Open Options" button
+  if (buttonIndex === 0) {
+    // "Open Options" button
     chrome.runtime.openOptionsPage()
   }
   chrome.notifications.clear(notificationId)
