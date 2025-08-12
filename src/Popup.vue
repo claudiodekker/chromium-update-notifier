@@ -37,7 +37,7 @@
             <div :class="[releaseIndex === releases.length - 1 ? 'h-6' : '-bottom-6', 'absolute left-0 top-0 flex w-6 justify-center']">
               <div class="w-px bg-gray-300 dark:bg-gray-600" />
             </div>
-            <div class="relative flex h-6 w-6 flex-none items-center justify-center bg-white dark:bg-chromiumPrimaryDark">
+            <div class="relative flex h-6 w-6 flex-none items-center justify-center bg-white dark:bg-chromium-primary-dark">
               <div class="h-1.5 w-1.5 rounded-full bg-yellow-400 ring-1 ring-yellow-500 dark:bg-yellow-600 dark:ring-yellow-500" />
             </div>
             <div class="flex w-full flex-col py-0.5 text-xs leading-5">
@@ -109,7 +109,7 @@
         </div>
       </template>
     </div>
-    <div class="sticky bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-white dark:to-chromiumPrimaryDark" />
+    <div class="sticky bottom-0 left-0 right-0 h-8 bg-linear-to-b from-transparent to-white dark:to-chromium-primary-dark" />
   </div>
 </template>
 

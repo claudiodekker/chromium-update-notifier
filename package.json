@@ -13,15 +13,15 @@
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/postcss": "^4.1.11",
     "@vitejs/plugin-vue": "^6.0.1",
-    "autoprefixer": "^10.4.17",
     "eslint": "^9.32.0",
     "eslint-plugin-vue": "^10.4.0",
     "postcss": "^8.4.33",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^4.2.0",
     "prettier-plugin-tailwindcss": "^0.6.14",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^4.1.11",
     "vite": "^7.1.0",
     "vue": "^3.3.11"
   },

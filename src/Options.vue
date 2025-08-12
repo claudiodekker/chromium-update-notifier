@@ -12,7 +12,7 @@
             <select
               v-model="repository"
               name="repository"
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-white/5 dark:text-white dark:ring-white/10 dark:focus:ring-indigo-500 [&_*]:text-black"
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-xs ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-white/5 dark:text-white dark:ring-white/10 dark:focus:ring-indigo-500 **:text-black"
             >
               <option v-for="repositoryLabel in repositories" :key="repositoryLabel" :value="repositoryLabel">
                 {{ repositoryLabel }}
@@ -27,7 +27,7 @@
             <select
               v-model="osFilter"
               name="os"
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-white/5 dark:text-white dark:ring-white/10 dark:focus:ring-indigo-500 [&_*]:text-black"
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-xs ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-white/5 dark:text-white dark:ring-white/10 dark:focus:ring-indigo-500 **:text-black"
             >
               <option v-for="(osFilterLabel, osFilterKey) in osFilterOptions" :key="osFilterLabel" :value="osFilterKey">
                 {{ osFilterLabel }}
@@ -42,7 +42,7 @@
             <select
               v-model="archFilter"
               name="arch"
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-white/5 dark:text-white dark:ring-white/10 dark:focus:ring-indigo-500 [&_*]:text-black"
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-xs ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-white/5 dark:text-white dark:ring-white/10 dark:focus:ring-indigo-500 **:text-black"
             >
               <option v-for="(archFilterLabel, archFilterKey) in archFilterOptions" :key="archFilterLabel" :value="archFilterKey">
                 {{ archFilterLabel }}
