@@ -2,7 +2,7 @@
   <div class="relative max-h-[450px] w-[600px] overflow-y-scroll">
     <div class="px-4 pt-4">
       <template v-if="releases.length === 0">
-        <h1 class="text-base font-semibold leading-6 text-gray-600 dark:text-gray-200">
+        <h1 class="text-base leading-6 font-semibold text-gray-600 dark:text-gray-200">
           No updates available.
         </h1>
         <div class="mt-1">
@@ -12,7 +12,7 @@
             repository since the last time you updated this browser.
             <br>
             <br>
-            <small class="text-xs italic text-gray-400 dark:text-gray-500">
+            <small class="text-xs text-gray-400 italic dark:text-gray-500">
               <template v-if="lastMatchingUpdate"> This repository last published a build that matches your filter settings {{ calculateRelativeTime(lastMatchingUpdate.published_at) }}. </template>
               <template v-else> This repository hasn't published any builds that match your filter settings yet. </template>
             </small>
@@ -21,7 +21,7 @@
       </template>
       <template v-else>
         <div class="pb-4">
-          <h1 class="text-base font-semibold leading-6 text-gray-600 dark:text-gray-200">
+          <h1 class="text-base leading-6 font-semibold text-gray-600 dark:text-gray-200">
             Newer version{{ releases.length > 1 ? 's' : '' }} are available.
           </h1>
           <div class="mt-1">
@@ -34,10 +34,10 @@
         </div>
         <div class="space-y-4">
           <div v-for="(release, releaseIndex) in releases" :key="release.name" class="relative flex gap-x-2">
-            <div :class="[releaseIndex === releases.length - 1 ? 'h-6' : '-bottom-6', 'absolute left-0 top-0 flex w-6 justify-center']">
+            <div :class="[releaseIndex === releases.length - 1 ? 'h-6' : '-bottom-6', 'absolute top-0 left-0 flex w-6 justify-center']">
               <div class="w-px bg-gray-300 dark:bg-gray-600" />
             </div>
-            <div class="relative flex h-6 w-6 flex-none items-center justify-center bg-white dark:bg-chromiumPrimaryDark">
+            <div class="dark:bg-chromium-primary-dark relative flex h-6 w-6 flex-none items-center justify-center bg-white">
               <div class="h-1.5 w-1.5 rounded-full bg-yellow-400 ring-1 ring-yellow-500 dark:bg-yellow-600 dark:ring-yellow-500" />
             </div>
             <div class="flex w-full flex-col py-0.5 text-xs leading-5">
@@ -45,7 +45,7 @@
                 <span><span class="cursor-pointer font-medium text-gray-600 hover:underline dark:text-gray-300" @click="openBrowserTab(release.html_url)">{{ release.name }}</span> was released.</span>
                 <time :datetime="release.published_at" :title="new Date(release.published_at).toLocaleString()" class="flex-none leading-5">{{ calculateRelativeTime(release.published_at) }}</time>
               </div>
-              <div class="ml-1 mt-1 flex flex-col gap-y-1">
+              <div class="mt-1 ml-1 flex flex-col gap-y-1">
                 <div v-for="asset in release.assets" :key="asset.url" class="flex gap-x-1">
                   <span class="flex cursor-pointer gap-x-1 text-gray-500 hover:text-black dark:hover:text-white" @click="initiateDownload(asset.url)">
                     <svg class="h-5 w-5" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -58,7 +58,7 @@
                     <span
                       v-if="asset.codesigned"
                       title="This build has been code-signed"
-                      class="inline-flex items-center text-nowrap rounded-md bg-green-500/10 px-1 py-0.5 text-xs font-medium text-green-500 ring-1 ring-inset ring-green-500/30 dark:text-green-400"
+                      class="inline-flex items-center rounded-md bg-green-500/10 px-1 py-0.5 text-xs font-medium text-nowrap text-green-500 ring-1 ring-green-500/30 ring-inset dark:text-green-400"
                     >
                       <svg class="h-4 w-4" data-slot="icon" fill="none" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path
@@ -70,37 +70,37 @@
                     </span>
                     <span
                       title="The operating system this build is built for"
-                      class="inline-flex items-center text-nowrap rounded-md bg-green-500/10 px-2 py-0.5 text-xs font-medium text-purple-500 ring-1 ring-inset ring-purple-500/30 dark:text-purple-400"
+                      class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-0.5 text-xs font-medium text-nowrap text-purple-500 ring-1 ring-purple-500/30 ring-inset dark:text-purple-400"
                     >{{ formatOSLabel(asset.os) }}</span>
                     <span
                       title="The CPU architecture that this build is based on"
-                      class="inline-flex items-center text-nowrap rounded-md bg-blue-400/10 px-2 py-0.5 text-xs font-medium uppercase text-blue-400 ring-1 ring-inset ring-blue-400/30"
+                      class="inline-flex items-center rounded-md bg-blue-400/10 px-2 py-0.5 text-xs font-medium text-nowrap text-blue-400 uppercase ring-1 ring-blue-400/30 ring-inset"
                     >{{ formatArchLabel(asset.arch) }}</span>
                   </span>
                   <template v-if="asset.hashes">
                     <span
                       v-if="asset.hashes.md5"
                       title="Click to copy MD5 hash"
-                      class="inline-flex cursor-pointer items-center rounded-md bg-slate-400/10 px-2 py-0.5 text-xs font-medium uppercase text-slate-400 ring-1 ring-inset ring-slate-400/30 hover:text-slate-500 dark:hover:text-slate-300"
+                      class="inline-flex cursor-pointer items-center rounded-md bg-slate-400/10 px-2 py-0.5 text-xs font-medium text-slate-400 uppercase ring-1 ring-slate-400/30 ring-inset hover:text-slate-500 dark:hover:text-slate-300"
                       @click="copyToClipboard(asset.hashes.md5)"
                     >MD5</span>
                     <span
                       v-if="asset.hashes.sha1"
                       title="Click to copy SHA1 hash"
-                      class="inline-flex cursor-pointer items-center rounded-md bg-slate-400/10 px-2 py-0.5 text-xs font-medium uppercase text-slate-400 ring-1 ring-inset ring-slate-400/30 hover:text-slate-500 dark:hover:text-slate-300"
+                      class="inline-flex cursor-pointer items-center rounded-md bg-slate-400/10 px-2 py-0.5 text-xs font-medium text-slate-400 uppercase ring-1 ring-slate-400/30 ring-inset hover:text-slate-500 dark:hover:text-slate-300"
                       @click="copyToClipboard(asset.hashes.sha1)"
                     >SHA1</span>
                     <span
                       v-if="asset.hashes.sha256"
                       title="Click to copy SHA256 hash"
-                      class="inline-flex cursor-pointer items-center rounded-md bg-slate-400/10 px-2 py-0.5 text-xs font-medium uppercase text-slate-400 ring-1 ring-inset ring-slate-400/30 hover:text-slate-500 dark:hover:text-slate-300"
+                      class="inline-flex cursor-pointer items-center rounded-md bg-slate-400/10 px-2 py-0.5 text-xs font-medium text-slate-400 uppercase ring-1 ring-slate-400/30 ring-inset hover:text-slate-500 dark:hover:text-slate-300"
                       @click="copyToClipboard(asset.hashes.sha256)"
                     >SHA256</span>
                   </template>
                   <span
                     v-if="asset.discriminator"
                     title="This is a special field to distinguish otherwise identical builds"
-                    class="inline-flex items-center text-nowrap rounded-md bg-pink-500/10 px-2 py-0.5 text-xs font-medium uppercase text-pink-500 ring-1 ring-inset ring-pink-500/30 dark:text-pink-400"
+                    class="inline-flex items-center rounded-md bg-pink-500/10 px-2 py-0.5 text-xs font-medium text-nowrap text-pink-500 uppercase ring-1 ring-pink-500/30 ring-inset dark:text-pink-400"
                   >{{ asset.discriminator }}</span>
                 </div>
               </div>
@@ -109,7 +109,7 @@
         </div>
       </template>
     </div>
-    <div class="sticky bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-white dark:to-chromiumPrimaryDark" />
+    <div class="dark:to-chromium-primary-dark sticky right-0 bottom-0 left-0 h-8 bg-linear-to-b from-transparent to-white" />
   </div>
 </template>
 
